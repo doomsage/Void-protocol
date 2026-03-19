@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VOID PROTOCOL v2</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="scanlines"></div>
+<div id="vignette"></div>
+<canvas id="shake-canvas"></canvas>
+
+<!-- TITLE -->
+<div id="title-screen" class="screen active">
+  <div class="title-bg"></div>
+  <div class="title-content">
+    <div class="pre-title blink">[ FRAGMENT DETECTED · SYSTEM INITIALIZING ]</div>
+    <h1 class="game-title">
+      <span class="gt-void">VOID</span>
+      <span class="gt-protocol">PROTOCOL</span>
+      <span class="gt-ver">v2.0</span>
+    </h1>
+    <p class="title-desc">Rogue AI. Corrupted network. No escape.<br>Survive. Evolve. Dominate.</p>
+    <div class="hs-row">
+      <div class="hs-item"><span class="hs-val" id="hs-score">000000</span><span class="hs-lbl">BEST SCORE</span></div>
+      <div class="hs-item"><span class="hs-val" id="hs-wave">00</span><span class="hs-lbl">BEST WAVE</span></div>
+      <div class="hs-item"><span class="hs-val" id="hs-kills">000</span><span class="hs-lbl">BEST KILLS</span></div>
+    </div>
+    <button class="btn-primary" id="start-btn"><span class="btn-shine"></span>INITIALIZE</button>
+    <div class="ctrl-grid">
+      <span class="ck">LEFT STICK</span><span class="cd">Move</span>
+      <span class="ck">RIGHT STICK</span><span class="cd">Aim + Auto-fire</span>
+      <span class="ck">DASH BTN</span><span class="cd">Invincible dash</span>
+      <span class="ck">WASD + CLICK</span><span class="cd">PC controls</span>
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE -->
+<div id="upgrade-screen" class="screen">
+  <div class="upg-bg"></div>
+  <div class="upg-wrap">
+    <div class="upg-title">EVOLUTION NODE</div>
+    <div class="upg-sub" id="upg-lv">LEVEL UP → LVL 2</div>
+    <div id="upg-cards"></div>
+    <div class="upg-hint blink">TAP TO INSTALL</div>
+  </div>
+</div>
+
+<!-- BOSS WARNING -->
+<div id="boss-screen" class="screen">
+  <div class="bw-wrap">
+    <div class="bw-alert blink">⚠ APEX THREAT DETECTED ⚠</div>
+    <div class="bw-name" id="bw-name">NULL CORE</div>
+    <div class="bw-sub">ELIMINATING INTRUDER FRAGMENT</div>
+    <div class="bw-bar"><div class="bw-fill" id="bw-fill"></div></div>
+  </div>
+</div>
+
+<!-- ARENA UNLOCK -->
+<div id="arena-screen" class="screen">
+  <div class="arena-wrap">
+    <div class="arena-title">⚡ ARENA UNLOCKED ⚡</div>
+    <div class="arena-sub" id="arena-name">SECTOR 7 — DEATH GRID</div>
+    <div class="arena-desc" id="arena-desc">Survive the gauntlet to proceed</div>
+    <button class="btn-primary" id="arena-enter-btn">ENTER ARENA</button>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover-screen" class="screen">
+  <div class="go-wrap">
+    <div class="go-title">PROCESS<br>TERMINATED</div>
+    <div class="go-stats" id="go-stats"></div>
+    <div class="go-btns">
+      <button class="btn-primary" id="retry-btn">REINITIALIZE</button>
+      <button class="btn-sec" id="menu-btn">MAIN MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAUSE -->
+<div id="pause-screen" class="screen">
+  <div class="pause-wrap">
+    <div class="pause-title">— PAUSED —</div>
+    <button class="btn-primary" id="resume-btn">RESUME</button>
+    <button class="btn-sec" id="quit-btn">QUIT</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="game-wrapper">
+
+  <!-- HUD TOP -->
+  <div id="hud-top">
+    <div class="hud-group">
+      <div class="hud-bar-block">
+        <span class="hud-lbl">HP</span>
+        <div class="hud-bar hp-bar"><div class="hud-fill hp-fill" id="hp-fill"></div></div>
+        <span class="hud-val" id="hp-val">100</span>
+      </div>
+      <div class="hud-bar-block">
+        <span class="hud-lbl">SH</span>
+        <div class="hud-bar sh-bar"><div class="hud-fill sh-fill" id="sh-fill"></div></div>
+      </div>
+      <div class="hud-bar-block">
+        <span class="hud-lbl">XP</span>
+        <div class="hud-bar xp-bar"><div class="hud-fill xp-fill" id="xp-fill"></div></div>
+        <span class="hud-val xp-lv" id="lv-val">LV1</span>
+      </div>
+    </div>
+    <div class="hud-center">
+      <span class="wave-lbl">WAVE</span>
+      <span class="wave-num" id="wave-val">01</span>
+    </div>
+    <div class="hud-group right">
+      <div class="hud-stat-block">
+        <span class="hud-lbl">SCORE</span>
+        <span class="hud-score" id="score-val">000000</span>
+      </div>
+      <div class="hud-stat-block">
+        <span class="hud-lbl">KILLS</span>
+        <span class="hud-kills" id="kill-val">0</span>
+      </div>
+      <div class="hud-stat-block">
+        <span class="hud-lbl">COMBO</span>
+        <span class="hud-combo" id="combo-val">x1</span>
+      </div>
+      <button class="pause-btn" id="pause-btn">⏸</button>
+    </div>
+  </div>
+
+  <!-- BOSS BAR -->
+  <div id="boss-hud" class="hidden">
+    <span class="boss-hud-name" id="boss-hud-name">APEX PROCESS</span>
+    <div class="boss-hud-bar"><div class="boss-hud-fill" id="boss-hud-fill"></div></div>
+    <span class="boss-phase" id="boss-phase">PHASE 1</span>
+  </div>
+
+  <!-- CANVAS -->
+  <div id="canvas-area">
+    <canvas id="game-canvas"></canvas>
+    <canvas id="minimap" width="85" height="85"></canvas>
+    <div id="status-msg"></div>
+    <div id="wep-hud">
+      <span id="wep-icon">●</span>
+      <span id="wep-name">PULSE</span>
+    </div>
+    <div id="arena-indicator" class="hidden">
+      <span>⚔ ARENA MODE</span>
+      <span id="arena-enemies-left">0 LEFT</span>
+    </div>
+    <!-- Floating texts rendered via canvas -->
+  </div>
+
+  <!-- BOTTOM HUD -->
+  <div id="hud-bottom">
+    <div id="buff-row"></div>
+  </div>
+
+  <!-- TOUCH CONTROLS -->
+  <div id="touch-ctrl">
+    <div class="joy-wrap" id="move-zone">
+      <div class="joy-ring"></div>
+      <div class="joy-knob" id="move-knob"></div>
+      <span class="joy-lbl">MOVE</span>
+    </div>
+    <div class="mid-btns">
+      <div class="ab-btn" id="dash-btn">
+        <span class="ab-icon">⚡</span>
+        <span class="ab-lbl">DASH</span>
+        <div class="ab-cd-bar" id="dash-cd"></div>
+      </div>
+    </div>
+    <div class="joy-wrap" id="fire-zone">
+      <div class="joy-ring"></div>
+      <div class="joy-knob" id="fire-knob"></div>
+      <span class="joy-lbl">AIM·FIRE</span>
+    </div>
+  </div>
+
+</div><!-- end game-wrapper -->
+
+<script src="game.js"></script>
+</body>
+</html>
